@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OfferStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum AdminStatus {
+  ACTIVE
+  BLOCKED
+}
+
+enum ApplicationStatus {
+  NEW
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Offer {
+  id              String      @id @default(cuid())
+  name            String
+  description     String
+  minAmount       Decimal     @db.Decimal(14, 2)
+  maxAmount       Decimal     @db.Decimal(14, 2)
+  availableTerms  Json
+  downPaymentRule Json
+  markupRule      Json
+  status          OfferStatus @default(ACTIVE)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  applications Application[]
+}
+
+model Calculation {
+  id              String   @id @default(cuid())
+  productPrice    Decimal  @db.Decimal(14, 2)
+  term            Int
+  initialPayment  Decimal  @db.Decimal(14, 2)
+  markup          Decimal  @db.Decimal(14, 2)
+  totalPrice      Decimal  @db.Decimal(14, 2)
+  periodicPayment Decimal  @db.Decimal(14, 2)
+  paymentSchedule Json
+  createdAt       DateTime @default(now())
+
+  application Application?
+}
+
+model Application {
+  id            String            @id @default(cuid())
+  name          String
+  phone         String
+  email         String?
+  telegram      String?
+  productName   String
+  offerId       String
+  calculationId String            @unique
+  comment       String?
+  status        ApplicationStatus @default(NEW)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  offer       Offer       @relation(fields: [offerId], references: [id])
+  calculation Calculation @relation(fields: [calculationId], references: [id])
+}
+
+model Admin {
+  id           String      @id @default(cuid())
+  login        String      @unique
+  passwordHash String
+  status       AdminStatus @default(ACTIVE)
+  createdAt    DateTime    @default(now())
+
+  auditLogs AuditLog[]
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  adminId   String?
+  action    String
+  object    Json
+  createdAt DateTime @default(now())
+
+  admin Admin? @relation(fields: [adminId], references: [id])
+}

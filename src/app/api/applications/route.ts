@@ -30,6 +30,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true });
     }
 
+    if (!process.env.DATABASE_URL) {
+      if (!payload.calculation) {
+        return NextResponse.json(
+          { error: "Для отправки заявки в demo-режиме передайте параметры расчёта" },
+          { status: 400 },
+        );
+      }
+
+      const offer = await getOfferForCalculation(payload.calculation.offerId);
+      const result = calculateInstallment({
+        productPrice: payload.calculation.productPrice,
+        term: payload.calculation.term,
+        initialPayment: payload.calculation.initialPayment,
+        minAmount: offer.minAmount,
+        maxAmount: offer.maxAmount,
+        availableTerms: offer.availableTerms,
+        downPaymentRule: offer.downPaymentRule,
+        markupRule: offer.markupRule,
+      });
+
+      await notifyNewApplication({
+        name: payload.name,
+        phone: payload.phone,
+        productName: payload.productName,
+        calculation: result,
+      });
+
+      return NextResponse.json({ ok: true, applicationId: crypto.randomUUID(), demo: true });
+    }
+
     const created = await prisma.$transaction(async (tx) => {
       let calculationId = payload.calculationId;
       let offerId = payload.calculation?.offerId;

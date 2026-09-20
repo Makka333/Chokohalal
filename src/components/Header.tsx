@@ -9,20 +9,29 @@ const links = [
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-10 border-b border-[#d8ddd7] bg-[#fbfaf6]/92 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
-        <Link href="/" className="text-lg font-black tracking-normal text-[#0c3b2e]">
-          Choko Halal
+    <header className="site-header">
+      <div className="site-header__inner">
+        <Link href="/" className="flex items-center gap-3 text-[#0c3b2e]">
+          <div className="brand-mark">
+            <span>CH</span>
+          </div>
+          <div>
+            <div className="text-lg font-black tracking-[-0.06em]">Choko Halal</div>
+            <div className="brand-caption">Рассрочка нового уровня</div>
+          </div>
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-semibold text-[#31423b] md:flex">
+
+        <nav className="site-nav">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-[#0c3b2e]">
+            <Link key={link.href} href={link.href}>
               {link.label}
             </Link>
           ))}
         </nav>
-        <Link href="/admin/login" className="text-sm font-semibold text-[#66736d] hover:text-[#0c3b2e]">
-          Admin
+
+        <Link href="/calculator" className="header-cta">
+          <span>Рассчитать</span>
+          <span className="header-cta__arrow">↗</span>
         </Link>
       </div>
     </header>

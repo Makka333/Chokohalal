@@ -53,6 +53,8 @@ export async function POST(request: Request) {
       await notifyNewApplication({
         name: payload.name,
         phone: payload.phone,
+        email: payload.email || undefined,
+        telegram: payload.telegram || undefined,
         productName: payload.productName,
         calculation: result,
       });
@@ -134,6 +136,8 @@ export async function POST(request: Request) {
     await notifyNewApplication({
       name: payload.name,
       phone: payload.phone,
+      email: payload.email || undefined,
+      telegram: payload.telegram || undefined,
       productName: payload.productName,
       calculation: created.result,
     });

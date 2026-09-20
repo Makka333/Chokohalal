@@ -26,7 +26,15 @@ export function Calculator() {
   useEffect(() => {
     let mounted = true;
     fetch("/api/offers")
-      .then((response) => response.json())
+      .then(async (response) => {
+        const data = (await response.json()) as { offers?: PublicOffer[]; error?: string };
+
+        if (!response.ok || !Array.isArray(data.offers)) {
+          throw new Error(data.error ?? "Не удалось загрузить предложения");
+        }
+
+        return { offers: data.offers };
+      })
       .then((data: { offers: PublicOffer[] }) => {
         if (!mounted) return;
         setOffers(data.offers);

@@ -58,8 +58,12 @@ export function ApplicationForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          calculationId: stored.calculationId,
-          offerId: stored.offerId,
+          calculation: {
+            offerId: stored.offerId,
+            productPrice: stored.result.productPrice,
+            term: stored.result.term,
+            initialPayment: stored.result.initialPayment,
+          },
         }),
       });
       const data = await response.json();

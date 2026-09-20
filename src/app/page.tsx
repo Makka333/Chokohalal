@@ -1,78 +1,127 @@
 import Link from "next/link";
 
 const steps = [
-  "Вы выбираете товар и вводите стоимость.",
-  "Сервис показывает утверждённую наценку для выбранного срока.",
-  "После заявки администратор проверяет данные и связывается с вами.",
+  "Выбираете товар и указываете стоимость.",
+  "Сервис показывает фиксированную наценку и итоговый график платежей.",
+  "Отправляете заявку — администратор проверяет и связывается с вами.",
 ];
 
-const benefits = ["Прозрачная итоговая цена", "Фиксированный график", "Без онлайн-оплаты на этапе MVP"];
+const benefits = [
+  { title: "Прозрачная цена", text: "Сумма, наценка и график известны заранее без скрытых условий." },
+  { title: "Фиксированный график", text: "Платёжные даты и размер платежей рассчитываются до подачи заявки." },
+  { title: "Надёжный MVP", text: "Без онлайн-оплаты, без плавающих ставок и без лишних рисков." },
+];
+
+const stats = [
+  { value: "3–18", label: "месяцев" },
+  { value: "5", label: "доступных сроков" },
+  { value: "7 млн ₽", label: "максимальная сумма" },
+];
 
 export default function HomePage() {
   return (
-    <main>
-      <section className="bg-[#0c3b2e] text-white">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#efe3cc]">Исламская рассрочка</p>
-            <h1 className="mt-4 max-w-3xl text-4xl font-black leading-tight md:text-6xl">
-              Понятный расчёт рассрочки до подачи заявки
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-[#dbe8df]">
-              Вы видите цену товара, фиксированную наценку, итоговую цену, первоначальный взнос и график платежей до отправки заявки.
+    <main className="page-shell">
+      <section className="hero-section">
+        <div className="hero-orb hero-orb--one" />
+        <div className="hero-orb hero-orb--two" />
+        <div className="hero-grid">
+          <div className="hero-copy">
+            <p className="eyebrow"><span className="eyebrow-dot" /> Исламская рассрочка</p>
+            <h1>Понятный и прозрачный расчёт рассрочки до подачи заявки</h1>
+            <p className="hero-text">
+              Сервис показывает цену товара, наценку, первоначальный взнос и график платежей заранее —
+              без сложных условий и без риска переплаты в процессе оформления.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/calculator" className="btn-primary bg-white text-[#0c3b2e] hover:bg-[#efe3cc]">
+            <div className="cta-row">
+              <Link href="/calculator" className="btn-primary btn-primary--light">
                 Рассчитать рассрочку
               </Link>
-              <Link href="/application" className="btn-secondary border-white text-white hover:bg-white/10">
+              <Link href="/application" className="btn-secondary btn-secondary--light">
                 Оставить заявку
               </Link>
             </div>
-            <p className="mt-8 rounded-lg border border-white/20 bg-white/10 p-4 text-sm text-[#f7efd7]">
-              Расчёт является предварительным и не является заключением договора.
+            <div className="stats-grid">
+              {stats.map((stat) => (
+                <div key={stat.label} className="mini-stat">
+                  <strong>{stat.value}</strong>
+                  <span>{stat.label}</span>
+                </div>
+              ))}
+            </div>
+            <p className="disclaimer-banner">
+              <span className="disclaimer-icon">✦</span>
+              Расчёт предварительный и не является заключением договора.
             </p>
           </div>
-          <div className="grid gap-4 rounded-lg border border-white/15 bg-[#143f34] p-5 shadow-2xl shadow-black/20">
-            <div className="rounded-lg bg-[#fbfaf6] p-5 text-[#10251f]">
-              <p className="text-sm text-[#66736d]">Пример расчёта</p>
-              <p className="mt-3 text-3xl font-black">100 000 ₽</p>
-              <div className="mt-5 grid gap-3 text-sm">
-                <div className="flex justify-between"><span>Наценка</span><b>15 000 ₽</b></div>
-                <div className="flex justify-between"><span>Итоговая цена</span><b>115 000 ₽</b></div>
-                <div className="flex justify-between"><span>Взнос</span><b>20 000 ₽</b></div>
-                <div className="flex justify-between border-t border-[#d8ddd7] pt-3"><span>12 платежей</span><b>7 916.67 ₽</b></div>
+
+          <div className="calculator-card">
+            <div className="calculator-card__header">
+              <span><span className="calculator-card__dot" /> Калькулятор рассрочки</span>
+              <span className="badge">LIVE</span>
+            </div>
+
+            <div className="calculator-form">
+              <div className="input-row">
+                <label>Цена товара</label>
+                <div className="amount-box">100 000 ₽</div>
+              </div>
+
+              <div className="input-row compact">
+                <label>Срок</label>
+                <div className="selector-box">12 месяцев</div>
+              </div>
+
+              <div className="input-row compact">
+                <label>Первоначальный взнос</label>
+                <div className="selector-box">20 000 ₽</div>
+              </div>
+
+              <div className="calculator-summary">
+                <div>
+                  <span>Наценка</span>
+                  <strong>15 000 ₽</strong>
+                </div>
+                <div>
+                  <span>Итоговая цена</span>
+                  <strong>115 000 ₽</strong>
+                </div>
+                <div>
+                  <span>Платёж</span>
+                  <strong>7 916.67 ₽</strong>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-14">
-        <div className="grid gap-8 md:grid-cols-3">
-          <div>
-            <h2 className="text-2xl font-black text-[#0c3b2e]">Как это работает</h2>
-            <p className="mt-3 text-[#66736d]">MVP реализует только заранее заданную финансовую модель без штрафов, плавающих ставок и онлайн-оплаты.</p>
-          </div>
+      <section className="section-block">
+        <div className="section-headline">
+          <p className="eyebrow eyebrow--green"><span className="eyebrow-dot eyebrow-dot--green" /> Как это работает</p>
+          <h2>Четыре простых шага к понятному решению</h2>
+        </div>
+        <div className="steps-grid">
           {steps.map((step, index) => (
-            <div key={step} className="panel p-5">
-              <span className="text-sm font-black text-[#0c3b2e]">0{index + 1}</span>
-              <p className="mt-3 font-semibold leading-7">{step}</p>
-            </div>
+            <article key={step} className="feature-card">
+              <span className="feature-number">0{index + 1}</span>
+              <p>{step}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-14">
-          <h2 className="text-2xl font-black text-[#0c3b2e]">Преимущества</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {benefits.map((benefit) => (
-              <div key={benefit} className="rounded-lg border border-[#d8ddd7] p-5 font-semibold">
-                {benefit}
-              </div>
-            ))}
-          </div>
+      <section className="section-block section-block--light">
+        <div className="section-headline">
+          <p className="eyebrow eyebrow--green">Преимущества</p>
+          <h2>Почему клиенты выбирают понятный формат рассрочки</h2>
+        </div>
+        <div className="benefits-grid">
+          {benefits.map((benefit) => (
+            <article key={benefit.title} className="benefit-card">
+              <h3>{benefit.title}</h3>
+              <p>{benefit.text}</p>
+            </article>
+          ))}
         </div>
       </section>
     </main>

@@ -19,40 +19,62 @@ export function serializeOffer(offer: Offer): PublicOffer {
 }
 
 export async function getActiveOffers(): Promise<PublicOffer[]> {
-  const offers = await prisma.offer.findMany({
-    where: { status: "ACTIVE" },
-    orderBy: { createdAt: "asc" },
-  });
-
-  if (offers.length > 0) {
-    return offers.map(serializeOffer);
+  if (!process.env.DATABASE_URL) {
+    return [DEFAULT_OFFER];
   }
 
-  const created = await prisma.offer.create({
-    data: {
-      name: DEFAULT_OFFER.name,
-      description: DEFAULT_OFFER.description,
-      minAmount: DEFAULT_OFFER.minAmount,
-      maxAmount: DEFAULT_OFFER.maxAmount,
-      availableTerms: DEFAULT_OFFER.availableTerms,
-      downPaymentRule: DEFAULT_OFFER.downPaymentRule,
-      markupRule: DEFAULT_OFFER.markupRule,
-      status: "ACTIVE",
-    },
-  });
+  try {
+    const offers = await prisma.offer.findMany({
+      where: { status: "ACTIVE" },
+      orderBy: { createdAt: "asc" },
+    });
 
-  return [serializeOffer(created)];
+    if (offers.length > 0) {
+      return offers.map(serializeOffer);
+    }
+
+    const created = await prisma.offer.create({
+      data: {
+        name: DEFAULT_OFFER.name,
+        description: DEFAULT_OFFER.description,
+        minAmount: DEFAULT_OFFER.minAmount,
+        maxAmount: DEFAULT_OFFER.maxAmount,
+        availableTerms: DEFAULT_OFFER.availableTerms,
+        downPaymentRule: DEFAULT_OFFER.downPaymentRule,
+        markupRule: DEFAULT_OFFER.markupRule,
+        status: "ACTIVE",
+      },
+    });
+
+    return [serializeOffer(created)];
+  } catch (error) {
+    console.error("Offers database is unavailable; using the default offer", error);
+    return [DEFAULT_OFFER];
+  }
 }
 
 export async function getOfferForCalculation(offerId?: string): Promise<PublicOffer> {
+  if (!process.env.DATABASE_URL) {
+    return DEFAULT_OFFER;
+  }
+
   if (offerId) {
-    const offer = await prisma.offer.findUnique({ where: { id: offerId } });
+    try {
+      const offer = await prisma.offer.findUnique({ where: { id: offerId } });
 
-    if (!offer || offer.status !== "ACTIVE") {
-      throw new Error("Offer not found");
+      if (!offer || offer.status !== "ACTIVE") {
+        throw new Error("Offer not found");
+      }
+
+      return serializeOffer(offer);
+    } catch (error) {
+      if (error instanceof Error && error.message === "Offer not found") {
+        throw error;
+      }
+
+      console.error("Offer database is unavailable; using the default offer", error);
+      return DEFAULT_OFFER;
     }
-
-    return serializeOffer(offer);
   }
 
   const [offer] = await getActiveOffers();

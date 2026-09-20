@@ -6,6 +6,18 @@ import { loginSchema } from "@/lib/validation";
 export async function POST(request: Request) {
   try {
     const payload = loginSchema.parse(await request.json());
+
+    if (
+      process.env.ADMIN_LOGIN &&
+      process.env.ADMIN_PASSWORD &&
+      payload.login === process.env.ADMIN_LOGIN &&
+      payload.password === process.env.ADMIN_PASSWORD
+    ) {
+      const token = await createAdminSession({ adminId: "env-admin", login: payload.login });
+      await setAdminCookie(token);
+      return NextResponse.json({ ok: true });
+    }
+
     const admin = await prisma.admin.findUnique({ where: { login: payload.login } });
 
     if (!admin || admin.status !== "ACTIVE") {

@@ -63,6 +63,14 @@ export async function requireAdmin(): Promise<AdminSession> {
     throw new Error("Unauthorized");
   }
 
+  if (session.adminId === "env-admin") {
+    if (process.env.ADMIN_LOGIN && session.login === process.env.ADMIN_LOGIN) {
+      return session;
+    }
+
+    throw new Error("Unauthorized");
+  }
+
   const admin = await prisma.admin.findUnique({
     where: { id: session.adminId },
     select: { id: true, login: true, status: true },

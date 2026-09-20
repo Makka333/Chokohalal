@@ -122,14 +122,17 @@ export function ApplicationForm() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="grid gap-2">
-            <span className="text-sm font-bold">Email</span>
-            <input className="field" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} />
+            <span className="text-sm font-bold">Email для ответа</span>
+            <input className="field" type="email" value={form.email} onChange={(event) => update("email", event.target.value)} placeholder="you@example.com" />
           </label>
           <label className="grid gap-2">
-            <span className="text-sm font-bold">Telegram</span>
+            <span className="text-sm font-bold">Telegram для ответа</span>
             <input className="field" value={form.telegram} onChange={(event) => update("telegram", event.target.value)} placeholder="@username" />
           </label>
         </div>
+        <p className="rounded-xl border border-[#d8ddd7] bg-[#f7f4ee] p-3 text-sm leading-6 text-[#66736d]">
+          Укажите хотя бы один способ связи: email или Telegram. Мы ответим удобным для вас способом.
+        </p>
 
         <label className="grid gap-2">
           <span className="text-sm font-bold">Название товара</span>

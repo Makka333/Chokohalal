@@ -4,6 +4,8 @@ import type { CalculationResult } from "@/types";
 export type ApplicationNotification = {
   name: string;
   phone: string;
+  email?: string;
+  telegram?: string;
   productName: string;
   calculation: CalculationResult;
 };
@@ -26,6 +28,8 @@ export function buildNotificationMessage(input: ApplicationNotification): string
     "",
     `Имя: ${input.name}`,
     `Телефон: ${input.phone}`,
+    `Email: ${input.email || "не указан"}`,
+    `Telegram: ${input.telegram || "не указан"}`,
     `Товар: ${input.productName}`,
     "",
     `Цена товара: ${input.calculation.productPrice}`,

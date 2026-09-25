@@ -14,7 +14,9 @@ export const calculationRequestSchema = z.object({
   offerId: z.string().min(1).optional(),
   productPrice: decimalString,
   term: z.coerce.number().int().positive(),
-  initialPayment: decimalString,
+  initialPayment: decimalString.optional(),
+  tariff: z.enum(["WITH_DOWN_PAYMENT", "NO_DOWN_PAYMENT"]).optional(),
+  initialPaymentPercent: decimalString.optional(),
 });
 
 export const applicationRequestSchema = z

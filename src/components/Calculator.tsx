@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { CalculationResult } from "@/components/CalculationResult";
-import type { CalculationResult as CalculationResultType, PublicOffer } from "@/types";
+import type { CalculationResult as CalculationResultType, Tariff } from "@/types";
 
 type CalculationResponse = {
   calculationId: string;
@@ -14,44 +14,13 @@ type CalculationResponse = {
 const storageKey = "chokohalal_calculation";
 
 export function Calculator() {
-  const [offers, setOffers] = useState<PublicOffer[]>([]);
-  const [offerId, setOfferId] = useState("");
-  const [productPrice, setProductPrice] = useState("100000.00");
-  const [initialPayment, setInitialPayment] = useState("20000.00");
+  const [tariff, setTariff] = useState<Tariff>("WITH_DOWN_PAYMENT");
+  const [productPrice, setProductPrice] = useState("100000");
+  const [initialPaymentPercent, setInitialPaymentPercent] = useState("20");
   const [term, setTerm] = useState(12);
   const [result, setResult] = useState<CalculationResponse | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let mounted = true;
-    fetch("/api/offers")
-      .then(async (response) => {
-        const data = (await response.json()) as { offers?: PublicOffer[]; error?: string };
-
-        if (!response.ok || !Array.isArray(data.offers)) {
-          throw new Error(data.error ?? "Не удалось загрузить предложения");
-        }
-
-        return { offers: data.offers };
-      })
-      .then((data: { offers: PublicOffer[] }) => {
-        if (!mounted) return;
-        setOffers(data.offers);
-        const first = data.offers[0];
-        if (first) {
-          setOfferId(first.id);
-          setTerm(first.availableTerms[0] ?? 3);
-        }
-      })
-      .catch(() => setError("Не удалось загрузить предложения"));
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const selectedOffer = useMemo(() => offers.find((offer) => offer.id === offerId), [offers, offerId]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,7 +31,12 @@ export function Calculator() {
       const response = await fetch("/api/calculations", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId, productPrice, term, initialPayment }),
+        body: JSON.stringify({
+          productPrice,
+          term,
+          tariff,
+          initialPaymentPercent: tariff === "WITH_DOWN_PAYMENT" ? initialPaymentPercent : "0",
+        }),
       });
       const data = await response.json();
 
@@ -89,16 +63,14 @@ export function Calculator() {
           </p>
         </div>
 
-        <label className="grid gap-2">
-          <span className="text-sm font-bold">Предложение</span>
-          <select className="field" value={offerId} onChange={(event) => setOfferId(event.target.value)} required>
-            {offers.map((offer) => (
-              <option key={offer.id} value={offer.id}>
-                {offer.name}
-              </option>
-            ))}
-          </select>
-        </label>
+        <div className="tariff-switch" role="tablist" aria-label="Тариф рассрочки">
+          <button type="button" className={tariff === "WITH_DOWN_PAYMENT" ? "is-active" : ""} onClick={() => setTariff("WITH_DOWN_PAYMENT")}>
+            С первоначальным взносом
+          </button>
+          <button type="button" className={tariff === "NO_DOWN_PAYMENT" ? "is-active" : ""} onClick={() => setTariff("NO_DOWN_PAYMENT")}>
+            Без первоначального взноса
+          </button>
+        </div>
 
         <label className="grid gap-2">
           <span className="text-sm font-bold">Стоимость товара, ₽</span>
@@ -111,33 +83,29 @@ export function Calculator() {
             onChange={(event) => setProductPrice(event.target.value)}
             required
           />
-          {selectedOffer ? (
-            <span className="text-xs text-[#66736d]">
-              Доступно от {selectedOffer.minAmount} ₽ до {selectedOffer.maxAmount} ₽
-            </span>
-          ) : null}
+          <span className="text-xs text-[#66736d]">Доступно от 5 000 ₽ до 1 000 000 ₽</span>
         </label>
 
         <label className="grid gap-2">
           <span className="text-sm font-bold">Срок</span>
           <select className="field" value={term} onChange={(event) => setTerm(Number(event.target.value))} required>
-            {selectedOffer?.availableTerms.map((availableTerm) => (
-              <option key={availableTerm} value={availableTerm}>
-                {availableTerm} месяцев
-              </option>
+            {Array.from({ length: 11 }, (_, index) => index + 2).map((availableTerm) => (
+              <option key={availableTerm} value={availableTerm}>{availableTerm} месяцев</option>
             ))}
           </select>
         </label>
 
-        <label className="grid gap-2">
-          <span className="text-sm font-bold">Первоначальный взнос, ₽</span>
+        <label className={`grid gap-2 ${tariff === "NO_DOWN_PAYMENT" ? "opacity-50" : ""}`}>
+          <span className="text-sm font-bold">Первоначальный взнос, %</span>
           <input
             className="field"
             inputMode="decimal"
-            min="0"
-            step="0.01"
-            value={initialPayment}
-            onChange={(event) => setInitialPayment(event.target.value)}
+            min="20"
+            max="80"
+            step="1"
+            value={tariff === "NO_DOWN_PAYMENT" ? "0" : initialPaymentPercent}
+            disabled={tariff === "NO_DOWN_PAYMENT"}
+            onChange={(event) => setInitialPaymentPercent(event.target.value)}
             required
           />
         </label>

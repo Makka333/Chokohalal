@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { calculateInstallment, CalculationError } from "@/lib/calculator";
+import { calculateInstallment, calculateTariffInstallment, CalculationError } from "@/lib/calculator";
 import { prisma } from "@/lib/db";
 import { getOfferForCalculation } from "@/lib/offers";
 import { calculationRequestSchema } from "@/lib/validation";
@@ -8,16 +8,23 @@ export async function POST(request: Request) {
   try {
     const payload = calculationRequestSchema.parse(await request.json());
     const offer = await getOfferForCalculation(payload.offerId);
-    const result = calculateInstallment({
-      productPrice: payload.productPrice,
-      term: payload.term,
-      initialPayment: payload.initialPayment,
-      minAmount: offer.minAmount,
-      maxAmount: offer.maxAmount,
-      availableTerms: offer.availableTerms,
-      downPaymentRule: offer.downPaymentRule,
-      markupRule: offer.markupRule,
-    });
+    const result = payload.tariff
+      ? calculateTariffInstallment({
+          tariff: payload.tariff,
+          productPrice: payload.productPrice,
+          term: payload.term,
+          initialPaymentPercent: payload.initialPaymentPercent ?? "20",
+        })
+      : calculateInstallment({
+          productPrice: payload.productPrice,
+          term: payload.term,
+          initialPayment: payload.initialPayment ?? "0",
+          minAmount: offer.minAmount,
+          maxAmount: offer.maxAmount,
+          availableTerms: offer.availableTerms,
+          downPaymentRule: offer.downPaymentRule,
+          markupRule: offer.markupRule,
+        });
 
     let calculationId = crypto.randomUUID();
 

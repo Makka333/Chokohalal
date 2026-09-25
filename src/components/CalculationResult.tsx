@@ -28,6 +28,14 @@ export function CalculationResult({ result }: { result: CalculationResultType })
           <p className="text-sm text-[#66736d]">Срок</p>
           <p className="mt-2 text-2xl font-black text-[#0c3b2e]">{result.term} мес.</p>
         </div>
+        {result.tariff ? (
+          <div className="rounded-lg border border-[#d8ddd7] bg-white p-4 sm:col-span-2">
+            <p className="text-sm text-[#66736d]">Тариф</p>
+            <p className="mt-2 text-lg font-black text-[#0c3b2e]">
+              {result.tariff === "WITH_DOWN_PAYMENT" ? "С первоначальным взносом" : "Без первоначального взноса"}
+            </p>
+          </div>
+        ) : null}
       </div>
       {result.lastPaymentDiffers ? (
         <p className="disclaimer rounded-lg p-4 text-sm">

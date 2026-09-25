@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { calculateInstallment, CalculationError } from "@/lib/calculator";
+import { calculateInstallment, calculateTariffInstallment, CalculationError } from "@/lib/calculator";
 import { prisma } from "@/lib/db";
 import { requireAdmin } from "@/lib/auth";
 import { notifyNewApplication } from "@/lib/notifications";
@@ -39,16 +39,23 @@ export async function POST(request: Request) {
       }
 
       const offer = await getOfferForCalculation(payload.calculation.offerId);
-      const result = calculateInstallment({
-        productPrice: payload.calculation.productPrice,
-        term: payload.calculation.term,
-        initialPayment: payload.calculation.initialPayment,
-        minAmount: offer.minAmount,
-        maxAmount: offer.maxAmount,
-        availableTerms: offer.availableTerms,
-        downPaymentRule: offer.downPaymentRule,
-        markupRule: offer.markupRule,
-      });
+      const result = payload.calculation.tariff
+        ? calculateTariffInstallment({
+            tariff: payload.calculation.tariff,
+            productPrice: payload.calculation.productPrice,
+            term: payload.calculation.term,
+            initialPaymentPercent: payload.calculation.initialPaymentPercent,
+          })
+        : calculateInstallment({
+            productPrice: payload.calculation.productPrice,
+            term: payload.calculation.term,
+            initialPayment: payload.calculation.initialPayment ?? "0",
+            minAmount: offer.minAmount,
+            maxAmount: offer.maxAmount,
+            availableTerms: offer.availableTerms,
+            downPaymentRule: offer.downPaymentRule,
+            markupRule: offer.markupRule,
+          });
 
       await notifyNewApplication({
         name: payload.name,
@@ -70,16 +77,23 @@ export async function POST(request: Request) {
       if (!calculationId && payload.calculation) {
         const offer = await getOfferForCalculation(payload.calculation.offerId);
         offerId = offer.id;
-        result = calculateInstallment({
-          productPrice: payload.calculation.productPrice,
-          term: payload.calculation.term,
-          initialPayment: payload.calculation.initialPayment,
-          minAmount: offer.minAmount,
-          maxAmount: offer.maxAmount,
-          availableTerms: offer.availableTerms,
-          downPaymentRule: offer.downPaymentRule,
-          markupRule: offer.markupRule,
-        });
+        result = payload.calculation.tariff
+          ? calculateTariffInstallment({
+              tariff: payload.calculation.tariff,
+              productPrice: payload.calculation.productPrice,
+              term: payload.calculation.term,
+              initialPaymentPercent: payload.calculation.initialPaymentPercent,
+            })
+          : calculateInstallment({
+              productPrice: payload.calculation.productPrice,
+              term: payload.calculation.term,
+              initialPayment: payload.calculation.initialPayment ?? "0",
+              minAmount: offer.minAmount,
+              maxAmount: offer.maxAmount,
+              availableTerms: offer.availableTerms,
+              downPaymentRule: offer.downPaymentRule,
+              markupRule: offer.markupRule,
+            });
 
         const calculation = await tx.calculation.create({
           data: {

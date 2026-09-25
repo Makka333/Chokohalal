@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateInstallment, generatePaymentSchedule } from "../src/lib/calculator";
+import { calculateInstallment, calculateTariffInstallment, generatePaymentSchedule } from "../src/lib/calculator";
 import { applicationRequestSchema } from "../src/lib/validation";
 import type { DownPaymentRule, TermMarkupRule } from "../src/types";
 
@@ -27,6 +27,36 @@ function calc(overrides: Partial<Parameters<typeof calculateInstallment>[0]> = {
 }
 
 describe("calculator", () => {
+  it("calculates the down payment tariff from the specification", () => {
+    const result = calculateTariffInstallment({
+      tariff: "WITH_DOWN_PAYMENT",
+      productPrice: "100000",
+      initialPaymentPercent: "20",
+      term: 12,
+      firstPaymentDate: new Date("2026-10-19T00:00:00.000Z"),
+    });
+
+    expect(result.initialPayment).toBe("20000.00");
+    expect(result.financedAmount).toBe("80000.00");
+    expect(result.markup).toBe("38400.00");
+    expect(result.periodicPayment).toBe("9866.67");
+    expect(result.totalClientCost).toBe("138400.00");
+  });
+
+  it("calculates the no down payment tariff from the specification", () => {
+    const result = calculateTariffInstallment({
+      tariff: "NO_DOWN_PAYMENT",
+      productPrice: "100000",
+      term: 12,
+      firstPaymentDate: new Date("2026-10-19T00:00:00.000Z"),
+    });
+
+    expect(result.initialPayment).toBe("0.00");
+    expect(result.markup).toBe("43200.00");
+    expect(result.periodicPayment).toBe("11933.33");
+    expect(result.totalClientCost).toBe("143200.00");
+  });
+
   it("accepts minimal amount", () => {
     const result = calc({ productPrice: "10000.00", initialPayment: "1000.00" });
     expect(result.productPrice).toBe("10000.00");

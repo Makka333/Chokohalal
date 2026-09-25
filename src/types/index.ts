@@ -8,6 +8,7 @@ export type ApplicationStatus =
 export type OfferStatus = "ACTIVE" | "INACTIVE";
 
 export type MarkupType = "FIXED_AMOUNT" | "PERCENT_OF_PRICE";
+export type Tariff = "WITH_DOWN_PAYMENT" | "NO_DOWN_PAYMENT";
 
 export type TermMarkupRule = {
   term: number;
@@ -43,6 +44,12 @@ export type CalculationResult = {
   paymentCount: number;
   paymentSchedule: PaymentScheduleItem[];
   lastPaymentDiffers: boolean;
+  tariff?: Tariff;
+  initialPaymentPercent?: string;
+  financedAmount?: string;
+  overpayment?: string;
+  totalClientCost?: string;
+  markupRate?: string;
 };
 
 export type PublicOffer = {

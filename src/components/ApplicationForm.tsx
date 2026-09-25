@@ -63,6 +63,8 @@ export function ApplicationForm() {
             productPrice: stored.result.productPrice,
             term: stored.result.term,
             initialPayment: stored.result.initialPayment,
+            tariff: stored.result.tariff,
+            initialPaymentPercent: stored.result.initialPaymentPercent,
           },
         }),
       });

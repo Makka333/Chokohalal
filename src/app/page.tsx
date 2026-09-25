@@ -27,10 +27,10 @@ export default function HomePage() {
         <div className="hero-grid">
           <div className="hero-copy">
             <p className="eyebrow"><span className="eyebrow-dot" /> Исламская рассрочка</p>
-            <h1>Понятный и прозрачный расчёт рассрочки до подачи заявки</h1>
+            <h1>Покупайте сегодня — <span>платите частями</span></h1>
             <p className="hero-text">
-              Сервис показывает цену товара, наценку, первоначальный взнос и график платежей заранее —
-              без сложных условий и без риска переплаты в процессе оформления.
+              Доступная и прозрачная рассрочка с понятными условиями, фиксированной наценкой и графиком платежей
+              до подачи заявки.
             </p>
             <div className="cta-row">
               <Link href="/calculator" className="btn-primary btn-primary--light">
@@ -98,7 +98,7 @@ export default function HomePage() {
       <section className="section-block">
         <div className="section-headline">
           <p className="eyebrow eyebrow--green"><span className="eyebrow-dot eyebrow-dot--green" /> Как это работает</p>
-          <h2>Четыре простых шага к понятному решению</h2>
+          <h2>Четыре шага к важной покупке</h2>
         </div>
         <div className="steps-grid">
           {steps.map((step, index) => (
@@ -122,6 +122,39 @@ export default function HomePage() {
               <p>{benefit.text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="tariffs-section">
+        <div className="section-headline">
+          <p className="eyebrow eyebrow--green"><span className="eyebrow-dot eyebrow-dot--green" /> Тарифы</p>
+          <h2>Два удобных варианта рассрочки</h2>
+        </div>
+        <div className="tariffs-grid">
+          <article className="tariff-card tariff-card--dark">
+            <span className="tariff-kicker">01 / Выгодный формат</span>
+            <h3>С первоначальным взносом</h3>
+            <p>Меньшая наценка и комфортный ежемесячный платёж.</p>
+            <ul>
+              <li>Взнос от 20% до 80%</li>
+              <li>Срок от 2 до 12 месяцев</li>
+              <li>Наценка от 9% до 48%</li>
+              <li>Один поручитель, возраст от 21 года</li>
+            </ul>
+            <Link href="/calculator" className="tariff-link">Рассчитать тариф <span>↗</span></Link>
+          </article>
+          <article className="tariff-card tariff-card--cream">
+            <span className="tariff-kicker">02 / Максимальная доступность</span>
+            <h3>Без первоначального взноса</h3>
+            <p>Начните пользоваться покупкой сейчас и платите равными частями.</p>
+            <ul>
+              <li>Первоначальный взнос 0 ₽</li>
+              <li>Срок от 2 до 12 месяцев</li>
+              <li>Наценка 3,6% за каждый месяц</li>
+              <li>Один поручитель, возраст от 21 года</li>
+            </ul>
+            <Link href="/calculator" className="tariff-link">Рассчитать тариф <span>↗</span></Link>
+          </article>
         </div>
       </section>
     </main>
